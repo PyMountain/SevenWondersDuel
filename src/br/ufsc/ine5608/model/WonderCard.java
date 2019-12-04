@@ -4,8 +4,8 @@ import java.util.ArrayList;
 
 public class WonderCard extends Card{
     
-    public WonderCard(ArrayList cost, String name, ArrayList effects, int victoryPoints) {
-        super(cost, name, effects, victoryPoints);
+    public WonderCard(ArrayList<Resource> resourcesCost, String name, ArrayList<Resource> resources, int victoryPoints, int cost) {
+        super(resourcesCost, name, resources, victoryPoints, cost);
     }
     
 }

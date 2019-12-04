@@ -6,8 +6,8 @@ public class AgeCard extends Card{
     
     private Type type;
     
-    public AgeCard(ArrayList cost, String name, ArrayList effects, Type type, int victoryPoints) {
-        super(cost, name, effects, victoryPoints);
+    public AgeCard(ArrayList<Resource> resourcesCost, String name, ArrayList<Resource> resources, Type type, int victoryPoints, int cost) {
+        super(resourcesCost, name, resources, victoryPoints, cost);
         this.type = type;
     }
     

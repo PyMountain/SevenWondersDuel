@@ -3,28 +3,34 @@ package br.ufsc.ine5608.model;
 import java.util.ArrayList;
 
 public class Card {
-   private ArrayList cost;
+   private ArrayList<Resource> resourcesCost;
    private String name;
-   private ArrayList effects;
+   private ArrayList<Resource> resources;
+   private int cost;
    private int victoryPoints;
 
-    public Card(ArrayList cost, String name, ArrayList effects, int victoryPoints) {
+    public Card(ArrayList<Resource> resourcesCost, String name, ArrayList<Resource> resources, int victoryPoints, int cost) {
         this.cost = cost;
         this.name = name;
-        this.effects = effects;
+        this.resources = resources;
         this.victoryPoints = victoryPoints;
+        this.resourcesCost = resourcesCost;
     }
    
-    public ArrayList getCost() {
+    public int getCost() {
         return cost;
+    }
+    
+    public ArrayList<Resource> getResourcesCost() {
+        return resourcesCost;
     }
 
     public String getName() {
         return name;
     }
 
-    public ArrayList getEffects() {
-        return effects;
+    public ArrayList<Resource> getResources() {
+        return resources;
     }
    
     public int getVictoryPoints(){

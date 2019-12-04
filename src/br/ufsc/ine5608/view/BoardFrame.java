@@ -1,5 +1,6 @@
 package br.ufsc.ine5608.view;
 
+import br.ufsc.ine5608.controller.CardTreeController;
 import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -15,29 +16,22 @@ import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
 import br.ufsc.ine5608.controller.GeneralController;
+import br.ufsc.ine5608.controller.PlayerController;
+import br.ufsc.ine5608.model.AgeCard;
+import java.util.ArrayList;
 
 public class BoardFrame extends JFrame {
      private static BoardFrame tfInstance; 
-     private ButtonManager buttonManager;
-     private JLabel lbProgress;
-     private JLabel lbConflict;
      private JLabel lbCardBoard;
      private JLabel lbPlayersItens;
-     private JTable tbProgress;
-     private JTable tbConflict;
      private JTable tbCardBoard;
      private JTable tbPlayersItens;
-     private JScrollPane spProgress;
-     private JScrollPane spConflict;
      private JScrollPane spCardBoard;
      private JScrollPane spPlayersItens;
-     private JButton btBuild;
-     private JButton btDiscard;
      private JButton btEndTurn;     
      
     public BoardFrame() {
         super("7 Wonders Duel");
-        this.buttonManager = new ButtonManager();
         this.screenConfiguration();
     }
     
@@ -65,73 +59,16 @@ public class BoardFrame extends JFrame {
         container.setSize(1280, 720);
         container.setLayout(new GridBagLayout());
         
-        // Progress label configuration
+        // Cardboard label configuration
         {
-            lbProgress = new JLabel();
-            lbProgress.setText("Progresso:");
-            GridBagConstraints cons = new GridBagConstraints();         
-            cons.gridy = 0;
-            cons.gridx = 0;
-            container.add(lbProgress, cons);
-        }
-        
-        // Progress table configuration
-        {
-            tbProgress = new JTable();
-            tbProgress.setPreferredScrollableViewportSize(new Dimension(400, 50));
-            tbProgress.setFillsViewportHeight(true);
+            lbCardBoard = new JLabel();
+            lbCardBoard.setText("Cartas da mesa:");
             GridBagConstraints cons = new GridBagConstraints();
             cons.fill = GridBagConstraints.HORIZONTAL;
             cons.ipadx = 1280; 
             cons.gridheight = 1;
             cons.gridwidth = 1;
-            cons.gridx = 0;
-            cons.gridy = 1;
-            spProgress = new JScrollPane(tbProgress);            
-            DefaultTableModel modelProgress = new DefaultTableModel(1, 5);            
-            tbProgress.setTableHeader(null);
-            this.tbProgress.setModel(modelProgress);            
-            this.repaint();            
-            // tbWonders.addMouseListener(tableManager);
-            container.add(spProgress, cons);          
-        }
-        
-        // Conflict label configuration
-        {
-            lbConflict = new JLabel();
-            lbConflict.setText("Conflito:");
-            GridBagConstraints cons = new GridBagConstraints();
-            cons.gridy = 2;
-            cons.gridx = 0;
-            container.add(lbConflict, cons);
-        }
-        
-        // Conflict table configuration
-        {
-            tbConflict = new JTable();
-            tbConflict.setPreferredScrollableViewportSize(new Dimension(400, 50));
-            tbConflict.setFillsViewportHeight(true);
-            GridBagConstraints cons = new GridBagConstraints();
-            cons.fill = GridBagConstraints.HORIZONTAL;               
-            cons.gridheight = 1;
-            cons.gridwidth = 1;
-            cons.gridx = 0;
-            cons.gridy = 3;      
-            spConflict = new JScrollPane(tbConflict);            
-            DefaultTableModel modelConflict = new DefaultTableModel(1, 19);            
-            tbConflict.setTableHeader(null);
-            this.tbConflict.setModel(modelConflict);            
-            this.repaint();            
-            // tbWonders.addMouseListener(tableManager);
-            container.add(spConflict, cons);            
-        }
-        
-     // Cardboard label configuration
-        {
-            lbCardBoard = new JLabel();
-            lbCardBoard.setText("Cartas da mesa:");
-            GridBagConstraints cons = new GridBagConstraints();
-            cons.gridy = 4;
+            cons.gridy = 0;
             cons.gridx = 0;
             container.add(lbCardBoard, cons);
         }
@@ -143,20 +80,44 @@ public class BoardFrame extends JFrame {
             tbCardBoard.setFillsViewportHeight(true);
             GridBagConstraints cons = new GridBagConstraints();
             cons.fill = GridBagConstraints.HORIZONTAL;
-            cons.ipady = 200;
+            cons.ipady = 500;
             cons.gridheight = 1;
             cons.gridwidth = 1;
             cons.gridx = 0;
-            cons.gridy = 5;
+            cons.gridy = 1;
             spCardBoard = new JScrollPane(tbCardBoard);
-            String[] age = {"Age 1"};
-            DefaultTableModel modelItens = new DefaultTableModel(age, 14);            
+            String[] age = {"Age "+CardTreeController.getInstance().getAge()};
+            DefaultTableModel modelItens = new DefaultTableModel(age, 10);
+            //setup click event for cardTree table
+            ArrayList<AgeCard> cardTreeCards = CardTreeController.getInstance().getCards();
+            for(int i = 0; i < cardTreeCards.size(); i++){
+                String label = "";
+                if(CardTreeController.getInstance().verifyCard(i)){
+                    label = cardTreeCards.get(i).getName();
+                } else {
+                    label = cardTreeCards.get(i).getName() + "-BLOQUEADA";
+                }
+                modelItens.setValueAt(label, i, 0);
+            }
+            tbCardBoard.addMouseListener(new java.awt.event.MouseAdapter() {
+                @Override
+                public void mouseClicked(java.awt.event.MouseEvent evt) {
+                    if(!PlayerController.getInstance().getPlayer().getPlayerTurn()){
+                        MessagePanel msgPanel = new MessagePanel("Não é sua vez!");
+                        msgPanel.showFrame();
+                    } else {
+                        int row = tbCardBoard.rowAtPoint(evt.getPoint());
+                        if(!CardTreeController.getInstance().verifyCard(row)){
+                            MessagePanel msgPanel = new MessagePanel("A carta não pode ser selecionada pois está bloqueada!");
+                            msgPanel.showFrame();
+                        } else {
+                            ActionPanel actionPanel = new ActionPanel(CardTreeController.getInstance().getCards().get(row));
+                            actionPanel.showFrame();
+                        }
+                    }
+                }
+            });
             this.tbCardBoard.setModel(modelItens);
-            // tbWonders.addMouseListener(tableManager);
-            // DefaultTableModel modelCards = new DefaultTableModel();
-            // modelCards.addColumn("Diponíveis");
-            // modelCards.addColumn("Bloqueadas");
-            // this.tbCardBoard.setModel(modelCards);
             this.repaint();
             container.add(spCardBoard, cons);            
         }
@@ -166,7 +127,10 @@ public class BoardFrame extends JFrame {
             lbPlayersItens = new JLabel();
             lbPlayersItens.setText("Seus itens:");
             GridBagConstraints cons = new GridBagConstraints();
-            cons.gridy = 7;
+            cons.ipadx = 1280; 
+            cons.gridheight = 1;
+            cons.gridwidth = 1;
+            cons.gridy = 2;
             cons.gridx = 0;
             container.add(lbPlayersItens, cons);
         }
@@ -178,55 +142,17 @@ public class BoardFrame extends JFrame {
             tbPlayersItens.setFillsViewportHeight(true);
             GridBagConstraints cons = new GridBagConstraints();
             cons.fill = GridBagConstraints.HORIZONTAL;
-            cons.ipady = 200;
+            cons.ipady = 300;
             cons.gridheight = 1;
             cons.gridwidth = 1;
             cons.gridx = 0;
-            cons.gridy = 8;
+            cons.gridy = 7;
             spPlayersItens = new JScrollPane(tbPlayersItens);
-            String[] players = {"Jogador 1", "Jogador 2"};
-            DefaultTableModel modelPlayers = new DefaultTableModel(players, 14);
+            String[] players = {PlayerController.getInstance().getPlayer().getName() + "- MOEDAS: " + PlayerController.getInstance().getPlayer().getCoins(), PlayerController.getInstance().getOponent().getName()+ "- MOEDAS: " + PlayerController.getInstance().getOponent().getCoins()};
+            DefaultTableModel modelPlayers = new DefaultTableModel(players, 15);
             this.tbPlayersItens.setModel(modelPlayers);
-            // tbWonders.addMouseListener(tableManager);  
             this.repaint();
             container.add(spPlayersItens, cons);            
-        }
-        
-     // Start button configuration
-        {
-            btBuild = new JButton();
-            btBuild.setText("Construir");
-            // btDraw.addActionListener(buttonManager);
-            GridBagConstraints cons = new GridBagConstraints();
-            cons.anchor = GridBagConstraints.LAST_LINE_START; 
-            cons.ipadx = 200;
-            cons.gridy = 9;
-            cons.gridx = 0;
-            container.add(btBuild, cons);
-        }
-        
-        {
-            btDiscard = new JButton();
-            btDiscard.setText("Descartar");
-            // btDraw.addActionListener(buttonManager);
-            GridBagConstraints cons = new GridBagConstraints();
-            cons.anchor = GridBagConstraints.PAGE_END;
-            cons.ipadx = 200;
-            cons.gridy = 9;
-            cons.gridx = 0;
-            container.add(btDiscard, cons);
-        }
-        
-        {
-            btEndTurn = new JButton();
-            btEndTurn.setText("Finalizar turno");
-            btEndTurn.addActionListener(buttonManager);
-            GridBagConstraints cons = new GridBagConstraints();
-            cons.anchor = GridBagConstraints.LAST_LINE_END;     
-            cons.ipadx = 200;
-            cons.gridy = 9;
-            cons.gridx = 0;
-            container.add(btEndTurn, cons);
         }
         
         this.setSize(1280, 720);
@@ -234,13 +160,5 @@ public class BoardFrame extends JFrame {
         this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     
-    private class ButtonManager implements ActionListener {
-        @Override
-        public void actionPerformed(ActionEvent ae) {
-            if(ae.getSource().equals(btEndTurn)) {
-                GeneralController.getInstance().finalFrame();
-            }
-        }        
-    }
     
 }

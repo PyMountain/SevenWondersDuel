@@ -1,6 +1,9 @@
 package br.ufsc.ine5608.view;
 
 import br.ufsc.ine5608.controller.GeneralController;
+import br.ufsc.ine5608.controller.PlayerController;
+import br.ufsc.ine5608.model.Card;
+import br.ufsc.ine5608.model.WonderCard;
 
 import java.awt.Container;
 import java.awt.Dimension;
@@ -10,6 +13,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.util.ArrayList;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -24,7 +28,6 @@ public class StartFrame extends JFrame {
     private JButton btContinue;
     private JTable tbWonders;
     private JScrollPane spWonders;
-    private TableManager tableManager;
     private ButtonManager buttonManager;
     private int wonderCode;
     private static StartFrame sfInstance;    
@@ -67,12 +70,17 @@ public class StartFrame extends JFrame {
             cons.gridwidth = 0;
             cons.gridx = 0;
             cons.gridy = -2;
-            spWonders = new JScrollPane(tbWonders);
-            tbWonders.addMouseListener(tableManager);            
-            String[] players = {"Jogador 1", "Jogador 2"};
-            DefaultTableModel modelPlayers = new DefaultTableModel(players, 1);
-            modelPlayers.setValueAt("As Pirâmides", 0, 0);
-            modelPlayers.setValueAt("A Grande Biblioteca", 0, 1);
+            spWonders = new JScrollPane(tbWonders);           
+            String[] players = {PlayerController.getInstance().getPlayer().getName(), PlayerController.getInstance().getOponent().getName()};
+            DefaultTableModel modelPlayers = new DefaultTableModel(players, 4);
+            ArrayList<WonderCard> plyWonders = PlayerController.getInstance().getPlayer().getItens().getWonders();
+            ArrayList<WonderCard> oponentWonders = PlayerController.getInstance().getOponent().getItens().getWonders();
+            for(int i = 0; i < plyWonders.size(); i++){
+                modelPlayers.setValueAt(plyWonders.get(i).getName(), i, 0);
+            }
+            for(int i = 0; i < oponentWonders.size(); i++){
+                modelPlayers.setValueAt(plyWonders.get(i).getName(), i, 1);
+            }
             this.tbWonders.setModel(modelPlayers);
             this.repaint();
             container.add(spWonders, cons);            
@@ -119,34 +127,5 @@ public class StartFrame extends JFrame {
                 GeneralController.getInstance().startGame();
             }
         }        
-    }
-
-    private class TableManager implements MouseListener {
-
-        @Override
-        public void mouseClicked(MouseEvent e) {
-            wonderCode = Integer.valueOf(tbWonders.getValueAt(tbWonders.getSelectedRow(), 3).toString());
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent arg0) {
-
-        }
-
-        @Override
-        public void mouseExited(MouseEvent arg0) {
-
-        }
-
-        @Override
-        public void mousePressed(MouseEvent arg0) {
-
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent arg0) {
-
-        }
-
     }
 }

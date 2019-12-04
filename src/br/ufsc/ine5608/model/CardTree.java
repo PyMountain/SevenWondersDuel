@@ -3,17 +3,17 @@ package br.ufsc.ine5608.model;
 import java.util.ArrayList;
 
 public class CardTree {
-    private ArrayList<Card> cards;
+    private ArrayList<AgeCard> cards;
     
-    public CardTree(ArrayList<Card> cards){
+    public CardTree(ArrayList<AgeCard> cards){
         this.cards = cards;
     }
 
-    public ArrayList<Card> getCards() {
+    public ArrayList<AgeCard> getCards() {
         return cards;
     }
 
-    public void setCards(ArrayList<Card> cards) {
+    public void setCards(ArrayList<AgeCard> cards) {
         this.cards = cards;
     }
     

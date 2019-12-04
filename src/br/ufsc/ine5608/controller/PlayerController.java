@@ -2,6 +2,7 @@ package br.ufsc.ine5608.controller;
 
 import br.ufsc.ine5608.model.Card;
 import br.ufsc.ine5608.model.Player;
+import br.ufsc.ine5608.model.Resource;
 import br.ufsc.ine5608.model.WonderCard;
 import br.ufsc.ine5608.rede.AtorNetgames;
 import br.ufsc.inf.leobr.cliente.Proxy;
@@ -44,6 +45,7 @@ public class PlayerController {
     }
 
     public void iniciarNovaPartida() {
+        this.player.setPlayerTurn(true);
         Proxy.getInstance().iniciarNovaPartida(1);
     }
     
@@ -53,11 +55,11 @@ public class PlayerController {
         this.player.setCoins(5);
         this.oponent.setCoins(5);
         
-        ArrayList<Card> initialWonders = new ArrayList<Card>();
-        initialWonders.add(new WonderCard(new ArrayList(), "grande muralha", new ArrayList(), 4));
-        initialWonders.add(new WonderCard(new ArrayList(), "torre de babel", new ArrayList(), 4));
-        initialWonders.add(new WonderCard(new ArrayList(), "piramide do egito", new ArrayList(), 4));
-        initialWonders.add(new WonderCard(new ArrayList(), "meu tio carlos", new ArrayList(), 4));
+        ArrayList<WonderCard> initialWonders = new ArrayList<WonderCard>();
+        initialWonders.add(new WonderCard(new ArrayList(), "As piramides", new ArrayList(), 15, 5));
+        initialWonders.add(new WonderCard(new ArrayList(), "templo de artemis", new ArrayList(), 15, 8));
+        initialWonders.add(new WonderCard(new ArrayList(), "a esfinge", new ArrayList(),15, 4));
+        initialWonders.add(new WonderCard(new ArrayList(), "o grande farol", new ArrayList(), 15, 7));
         
         this.player.getItens().setWonders(initialWonders);
         this.oponent.getItens().setWonders(initialWonders);
@@ -93,6 +95,10 @@ public class PlayerController {
     
     public void updateResources(int coins){
         
+    }
+
+    public Player getOponent() {
+        return this.oponent;
     }
 
 }

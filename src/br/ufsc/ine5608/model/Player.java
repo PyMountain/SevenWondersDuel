@@ -9,9 +9,13 @@ public class Player {
     private String name;
     private int coins;
     private Itens itens;
+    private boolean playerTurn;
+    private ArrayList<Resource> resources;
 
     public Player() {
         itens = new Itens();
+        this.playerTurn = false;
+        resources = new ArrayList();
     }
     
     //getters and setters
@@ -58,11 +62,19 @@ public class Player {
     }
     
     public ArrayList getAgeCards(){
-        return new ArrayList();
+        return this.itens.getAge1Cards();
     }
     
     public void addAgeCard(AgeCard ageCard){
         
+    }
+
+    public void setPlayerTurn(boolean b) {
+        this.playerTurn = b;
+    }
+
+    public boolean getPlayerTurn() {
+        return this.playerTurn;
     }
     
     
