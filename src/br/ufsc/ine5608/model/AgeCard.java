@@ -11,4 +11,8 @@ public class AgeCard extends Card{
         this.type = type;
     }
     
+    public Type getType(){
+        return this.type;
+    }
+    
 }

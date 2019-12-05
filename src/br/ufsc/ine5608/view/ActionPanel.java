@@ -1,6 +1,8 @@
 package br.ufsc.ine5608.view;
 
+import br.ufsc.ine5608.controller.GeneralController;
 import br.ufsc.ine5608.controller.PlayerController;
+import br.ufsc.ine5608.model.Action;
 import br.ufsc.ine5608.model.AgeCard;
 import br.ufsc.ine5608.model.Resource;
 import java.awt.Container;
@@ -23,15 +25,15 @@ public class ActionPanel extends JFrame {
     private JLabel lbResourcesCost;
     private ButtonManager buttonManager;
     private static HomeFrame actionPanelInstance;
-    private MessagePanel msgPanel;
-    private ConectPanel cnctPanel;
     private AgeCard selectedCard;
+    private int position;
     
-    public ActionPanel(AgeCard selectedCard) {
+    public ActionPanel(AgeCard selectedCard, int position) {
         super("Selecionar ação");
         this.buttonManager = new ButtonManager();
         this.selectedCard = selectedCard;
-         this.screenConfiguration(); 
+        this.position = position;
+        this.screenConfiguration(); 
     }
     
     private void screenConfiguration() {
@@ -103,7 +105,7 @@ public class ActionPanel extends JFrame {
                         break;
                 }
             }
-            lbResourcesCost.setText(resourcesString);
+            lbResourcesCost.setText(resourcesString + "e " +selectedCard.getVictoryPoints() + " pontos de vitória.");
             GridBagConstraints cons = new GridBagConstraints();
             cons.gridy = 3;
             cons.gridx = 0;
@@ -142,7 +144,6 @@ public class ActionPanel extends JFrame {
         
         this.setSize(600, 400);
         this.setLocationRelativeTo(null);
-        this.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     
     public void showFrame() {
@@ -157,9 +158,16 @@ public class ActionPanel extends JFrame {
         @Override
         public void actionPerformed(ActionEvent ae) {
             if(ae.getSource().equals(btBuild)) {
-                
+                if(GeneralController.getInstance().verifyCanBuild(selectedCard)){
+                    hideFrame();
+                    GeneralController.getInstance().processMove(Action.BUILD, selectedCard, position, null);
+                } else {
+                    MessagePanel msgPanel = new MessagePanel("Voce não tem recursos para construir essa carta");
+                    msgPanel.showFrame();
+                }
             } else if(ae.getSource().equals(btDiscard)) {
-                
+                hideFrame();
+                GeneralController.getInstance().processMove(Action.DISCARD, selectedCard, position, null);
             } else if(ae.getSource().equals(btBuildWonder)){
                 
             }

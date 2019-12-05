@@ -9,13 +9,15 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 
 public class FinalFrame extends JFrame {
-	private static FinalFrame ffInstance;
-	private JLabel lbplayerOne;
-	private JLabel lbplayerTwo;
-	private JLabel lbwinnerPlayer;
-	private JLabel lbloserPlayer;
+    private static FinalFrame ffInstance;
+    private JLabel lbplayerOne;
+    private JLabel lbplayerTwo;
+    private JLabel lbwinnerPlayer;
+    private JLabel lbloserPlayer;
+    private String winnerName;
+    private String loserName;
 		
-	public FinalFrame() {
+    public FinalFrame() {
         super("7 Wonders Duel - Final");
         this.screenConfiguration();
     }
@@ -27,7 +29,9 @@ public class FinalFrame extends JFrame {
         return ffInstance;
     }
     
-    public void showFrame() {
+    public void showFrame(String winnerName, String loserName) {
+        this.winnerName = winnerName;
+        this.loserName = loserName;
         this.setVisible(true);
     }
     
@@ -43,7 +47,7 @@ public class FinalFrame extends JFrame {
      // Player one label configuration
         {
             lbplayerOne = new JLabel();
-            lbplayerOne.setText("Jogador 1");
+            lbplayerOne.setText(winnerName);
             GridBagConstraints cons = new GridBagConstraints();
             cons.ipadx = 200;
             cons.anchor = GridBagConstraints.FIRST_LINE_START;             
@@ -55,7 +59,7 @@ public class FinalFrame extends JFrame {
      // Player two label configuration
         {
             lbplayerTwo = new JLabel();
-            lbplayerTwo.setText("Jogador 2");
+            lbplayerTwo.setText(loserName);
             GridBagConstraints cons = new GridBagConstraints();
             cons.anchor = GridBagConstraints.FIRST_LINE_END;          
             cons.gridy = 0;

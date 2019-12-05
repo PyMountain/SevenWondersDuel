@@ -2,7 +2,6 @@ package br.ufsc.ine5608.view;
 
 import br.ufsc.ine5608.controller.GeneralController;
 import br.ufsc.ine5608.controller.PlayerController;
-import br.ufsc.ine5608.model.Card;
 import br.ufsc.ine5608.model.WonderCard;
 
 import java.awt.Container;
@@ -11,8 +10,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.util.ArrayList;
 
 import javax.swing.JButton;

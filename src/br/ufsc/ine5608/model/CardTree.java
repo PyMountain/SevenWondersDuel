@@ -18,7 +18,7 @@ public class CardTree {
     }
     
     public void removeCard(int position){
-        cards.remove(position);
+        cards.set(position, new AgeCard(new ArrayList(), "Carta usada", new ArrayList(), Type.CIVILIAN, 0, 0));
     }
     
     

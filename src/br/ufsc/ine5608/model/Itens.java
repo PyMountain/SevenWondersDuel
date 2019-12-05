@@ -7,9 +7,14 @@ public class Itens {
     private ArrayList<AgeCard> age2Cards;
     private ArrayList<AgeCard> age3Cards;
     private ArrayList<WonderCard> wonderCards;
-    private ArrayList<WonderCard> playerCards;
+    private ArrayList<AgeCard> playerCards;
 
     public Itens() {
+        age1Cards = new ArrayList();
+        age2Cards = new ArrayList();
+        age3Cards = new ArrayList();
+        wonderCards = new ArrayList();
+        playerCards = new ArrayList();
     }
 
     public void setWonders(ArrayList wonders){
@@ -30,6 +35,18 @@ public class Itens {
 
     public void setAge2Cards(ArrayList<AgeCard> age2Cards) {
         this.age2Cards = age2Cards;
+    }
+
+    public ArrayList<WonderCard> getWonderCards() {
+        return wonderCards;
+    }
+
+    public void setWonderCards(ArrayList<WonderCard> wonderCards) {
+        this.wonderCards = wonderCards;
+    }
+
+    public ArrayList<AgeCard> getPlayerCards() {
+        return playerCards;
     }
 
     public ArrayList<AgeCard> getAge3Cards() {

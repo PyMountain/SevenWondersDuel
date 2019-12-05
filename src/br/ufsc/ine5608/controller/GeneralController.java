@@ -1,24 +1,30 @@
 package br.ufsc.ine5608.controller;
 
+import br.ufsc.ine5608.model.Action;
 import br.ufsc.ine5608.model.AgeCard;
 import br.ufsc.ine5608.model.Card;
 import br.ufsc.ine5608.model.Itens;
+import br.ufsc.ine5608.model.Move;
 import br.ufsc.ine5608.model.Player;
 import br.ufsc.ine5608.model.Resource;
 import br.ufsc.ine5608.model.Type;
 import br.ufsc.ine5608.model.WonderCard;
+import br.ufsc.ine5608.rede.AtorNetgames;
 import br.ufsc.ine5608.view.FinalFrame;
 import br.ufsc.ine5608.view.StartFrame;
 import br.ufsc.ine5608.view.BoardFrame;
 import br.ufsc.ine5608.view.HomeFrame;
+import br.ufsc.inf.leobr.cliente.Jogada;
 import java.util.ArrayList;
 
 public class GeneralController {
     private static GeneralController singleGeneralCtrl;
     private Itens gameCards;
+    protected AtorNetgames ngServer;
           
     public GeneralController() {
         this.gameCards = new Itens();
+        ngServer = AtorNetgames.getInstance();
     }
     
     public static GeneralController getInstance() {
@@ -44,29 +50,81 @@ public class GeneralController {
         BoardFrame.getInstance().showFrame();
     }
     
-    public void finalFrame() {
-    	BoardFrame.getInstance().hideFrame();
-    	FinalFrame.getInstance().showFrame();
+    public void updateTable(Action action, AgeCard selectedCard, boolean received, int cardPosition, WonderCard selectedWonder){
+        PlayerController.getInstance().getPlayer().setPlayerTurn(received);
+        switch (action) {
+            case BUILD:
+                buildCard(selectedCard, cardPosition, received);
+                verifyEndOfAge();
+                BoardFrame.getInstance().tableRefresh();
+                break;
+            case DISCARD:
+                discard(cardPosition, received);
+                verifyEndOfAge();
+                BoardFrame.getInstance().tableRefresh();
+                break;
+            case BUILDWONDER:
+                buildWonder(selectedCard, cardPosition, received, selectedWonder);
+                break;
+            default:
+                break;
+        }
     }
     
-    public void updateTable(){
-        
+    public void verifyEndOfAge(){
+        if(CardTreeController.getInstance().getUsedCards() == 10){
+            switch(CardTreeController.getInstance().getAge()) {
+                case 1: CardTreeController.getInstance().setAgeCards(gameCards.getAge2Cards());
+                    break;
+                case 2: CardTreeController.getInstance().setAgeCards(gameCards.getAge3Cards());
+                    break;
+                case 3: this.endMatch();
+                    break;
+            }
+        }
     }
     
-    public void discard(int cardPosition){
+    public void buildCard(AgeCard selectedCard, int cardPosition, boolean received){
         CardTreeController.getInstance().removeCard(cardPosition);
+        if(received){
+            for(Resource res: selectedCard.getResources()){
+                PlayerController.getInstance().getOponent().getResources().add(res);
+            }
+            PlayerController.getInstance().getOponent().addAgeCard(selectedCard);
+            PlayerController.getInstance().getOponent().removeCoins(selectedCard.getCost());
+        } else {
+            for(Resource res: selectedCard.getResources()){
+                PlayerController.getInstance().getPlayer().getResources().add(res);
+            }
+            PlayerController.getInstance().getPlayer().addAgeCard(selectedCard);
+            PlayerController.getInstance().getPlayer().removeCoins(selectedCard.getCost());
+        }
     }
     
-    public void buildWonder(int cardPosition, WonderCard wonder){
-        
+    public void discard(int cardPosition, boolean received){
+        CardTreeController.getInstance().removeCard(cardPosition);
+        if(received){
+            PlayerController.getInstance().getOponent().addCoins(5 + PlayerController.getInstance().getOponent().getYellowCardsNumber());
+        }else {
+            PlayerController.getInstance().getPlayer().addCoins(5 + PlayerController.getInstance().getPlayer().getYellowCardsNumber());
+        }
     }
     
-    public void definePlayersWonders(){
-        
-    }
-    
-    public void defineStartCards(){
-        
+    public void buildWonder(AgeCard selectedCard, int cardPosition, boolean received, WonderCard wonder){
+        CardTreeController.getInstance().removeCard(cardPosition);
+        if(received){
+            for(Resource res: wonder.getResources()){
+                PlayerController.getInstance().getOponent().getResources().add(res);
+            }
+            PlayerController.getInstance().getOponent().getItens().getWonderCards().remove(wonder);
+            PlayerController.getInstance().getOponent().removeCoins(selectedCard.getCost());
+        } else {
+            for(Resource res: wonder.getResources()){
+                PlayerController.getInstance().getPlayer().getResources().add(res);
+            }
+            PlayerController.getInstance().getPlayer().addAgeCard(selectedCard);
+            PlayerController.getInstance().getPlayer().removeCoins(selectedCard.getCost());
+        }
     }
     
     public void setGameCards(){
@@ -226,16 +284,61 @@ public class GeneralController {
         //end of setup cards
     }
     
-    public void processMove(){
-        
+    public void processMove(Action action, AgeCard selectedCard, int cardPosition, WonderCard selectedWonder){
+        this.ngServer.enviaJogada(new Move(action, selectedCard, selectedWonder, cardPosition));
+        updateTable(action, selectedCard, false, cardPosition, selectedWonder);
     }
     
     public boolean verifyCard(int cardPosition){
         return CardTreeController.getInstance().verifyCard(cardPosition);
     }
     
-    public boolean jogadaBuilded(){
-        return false;
+    public boolean verifyCanBuild(AgeCard selectedCard){
+        ArrayList<Resource> auxCost = selectedCard.getResourcesCost();
+        ArrayList<Resource> auxPlayer = PlayerController.getInstance().getPlayer().getResources();
+        for(Resource res : auxCost){
+            if(auxPlayer.contains(res)){
+                auxCost.remove(res);
+            }
+        }
+        return auxCost.isEmpty() && selectedCard.getCost() < PlayerController.getInstance().getPlayer().getCoins();
+    }
+    
+    public boolean verifyCanBuildWonder(WonderCard selectedCard){
+        ArrayList<Resource> auxCost = selectedCard.getResourcesCost();
+        ArrayList<Resource> auxPlayer = PlayerController.getInstance().getPlayer().getResources();
+        for(Resource res : auxCost){
+            if(auxPlayer.contains(res)){
+                auxCost.remove(res);
+            }
+        }
+        return auxCost.isEmpty() && selectedCard.getCost() < PlayerController.getInstance().getPlayer().getCoins();
+    }
+    
+    public void endMatch(){
+        int playerPoints = PlayerController.getInstance().getPlayer().getCoins();
+        for(AgeCard card : PlayerController.getInstance().getPlayer().getAgeCards()){
+            playerPoints += card.getVictoryPoints();
+        }
+        
+        int oponentPoints = PlayerController.getInstance().getOponent().getCoins();
+        for(AgeCard card : PlayerController.getInstance().getOponent().getAgeCards()){
+            oponentPoints += card.getVictoryPoints();
+        }
+        String winnerName = "";
+        String loserName = "";
+        if(playerPoints >= oponentPoints){
+            winnerName = PlayerController.getInstance().getPlayer().getName();
+            loserName = PlayerController.getInstance().getOponent().getName();
+        } else {
+            winnerName = PlayerController.getInstance().getOponent().getName();
+            loserName = PlayerController.getInstance().getPlayer().getName();
+        }
+        
+        BoardFrame.getInstance().hideFrame();
+        FinalFrame.getInstance().showFrame(winnerName, loserName);
+        
+        
     }
     
 }

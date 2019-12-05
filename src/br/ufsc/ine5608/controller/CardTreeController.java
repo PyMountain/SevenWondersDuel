@@ -9,9 +9,11 @@ public class CardTreeController {
     private CardTree cardTree;
     private static CardTreeController ctCtrl;
     private int age;
+    private int usedCards;
     
     private CardTreeController(){
         this.cardTree = new CardTree(new ArrayList());
+        this.usedCards = 0;
         this.age = 0;
     }
     
@@ -30,6 +32,7 @@ public class CardTreeController {
     }
     
     public void removeCard(int cardPosition){
+        this.usedCards++;
         this.cardTree.removeCard(cardPosition);
     }
     
@@ -39,12 +42,16 @@ public class CardTreeController {
     }
     
     public boolean verifyCard(int position){
-        return (position % 2 == 0) ||((this.cardTree.getCards().get(position - 1).getName().equals("Carta usada")) && (this.cardTree.getCards().get(position + 1).getName().equals("Carta usada"))) ;
+        return (!this.cardTree.getCards().get(position).getName().equals("Carta usada")) && ((position % 2 == 0) || ((this.cardTree.getCards().get(position - 1).getName().equals("Carta usada")) && (this.cardTree.getCards().get(position + 1).getName().equals("Carta usada")))) ;
         
     }
 
     public int getAge() {
         return this.age;
+    }
+    
+    public int getUsedCards(){
+        return this.usedCards;
     }
     
     

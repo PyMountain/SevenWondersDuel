@@ -1,8 +1,9 @@
 package br.ufsc.ine5608.model;
 
+import br.ufsc.inf.leobr.cliente.Jogada;
 import java.util.ArrayList;
 
-public class Card {
+public class Card implements Jogada{
    private ArrayList<Resource> resourcesCost;
    private String name;
    private ArrayList<Resource> resources;

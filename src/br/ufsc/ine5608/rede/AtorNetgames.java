@@ -2,8 +2,11 @@ package br.ufsc.ine5608.rede;
 
 //import javax.swing.JOptionPane;
 
+import br.ufsc.ine5608.controller.CardTreeController;
 import br.ufsc.ine5608.controller.GeneralController;
 import br.ufsc.ine5608.controller.PlayerController;
+import br.ufsc.ine5608.model.Action;
+import br.ufsc.ine5608.model.Move;
 import br.ufsc.inf.leobr.cliente.Jogada;
 import br.ufsc.inf.leobr.cliente.OuvidorProxy;
 import br.ufsc.inf.leobr.cliente.Proxy;
@@ -16,12 +19,20 @@ public class AtorNetgames implements OuvidorProxy {
 	
 	private static final long serialVersionUID = 1L;
 	protected Proxy proxy;
+        private static AtorNetgames netgamesInstance;
 	
-	public AtorNetgames() {
+	private AtorNetgames() {
             super();
             this.proxy = Proxy.getInstance();
             proxy.addOuvinte(this);	
 	}
+        
+        public static AtorNetgames getInstance() {        
+            if (netgamesInstance == null) {
+                    netgamesInstance = new AtorNetgames();
+            }        
+            return netgamesInstance;
+        }
 	
 	public String conectar(String servidor, String nome) {
             try {
@@ -109,9 +120,23 @@ public class AtorNetgames implements OuvidorProxy {
 
 	@Override
 	public void receberJogada(Jogada jogada) {
-		// TODO Auto-generated method stub
-		
+            Move jogadaMove = (Move)jogada;
+            int n = 0;
+            while( n < CardTreeController.getInstance().getCards().size()){
+                if(CardTreeController.getInstance().getCards().get(n).getName().equals(jogadaMove.getCard().getName())){
+                    break;
+                }
+                n++;
+            } 
+            GeneralController.getInstance().updateTable(jogadaMove.getAction(), jogadaMove.getCard(), true, n, jogadaMove.getWonderCard());
 	}
+        
+        public void enviaJogada(Move jogada){
+            try{
+                proxy.enviaJogada(jogada);
+            }catch (Exception e){
+            }
+        }
 
 	@Override
 	public void tratarConexaoPerdida() {

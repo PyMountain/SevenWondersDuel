@@ -17,7 +17,7 @@ public class PlayerController {
     private PlayerController(){
         this.player = new Player();
         this.oponent = new Player();
-        ngServer = new AtorNetgames();
+        ngServer = AtorNetgames.getInstance();
     }
     
     public static PlayerController getInstance(){
@@ -67,34 +67,6 @@ public class PlayerController {
     
     public Player getPlayer(){
         return this.player;
-    }
-    
-    public Player addAgeCard(int ageCard){
-        return this.player;
-    }
-    
-    public void discard(){
-        
-    }
-    
-    public void setWonders(){
-        
-    }
-    
-    public boolean verifyResources(String resources){
-        return false;
-    }
-    
-    public String countResources(){
-        return "";
-    }
-    
-    public void charge(int cost) {
-        
-    }
-    
-    public void updateResources(int coins){
-        
     }
 
     public Player getOponent() {

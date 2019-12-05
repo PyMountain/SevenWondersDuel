@@ -54,19 +54,29 @@ public class Player {
     }
     
     public int getYellowCardsNumber(){
-        return 0;
+        int n = 0;
+        for(AgeCard card : this.itens.getPlayerCards()){
+            if(card.getType().equals(Type.COMMERCIAL)){
+                n++;
+            }
+        }
+        return n;
     }
     
     public void setWonders(ArrayList wonders){
         
     }
     
-    public ArrayList getAgeCards(){
-        return this.itens.getAge1Cards();
+    public ArrayList<AgeCard> getAgeCards(){
+        return this.itens.getPlayerCards();
+    }
+
+    public ArrayList<Resource> getResources() {
+        return resources;
     }
     
     public void addAgeCard(AgeCard ageCard){
-        
+        this.itens.getPlayerCards().add(ageCard);
     }
 
     public void setPlayerTurn(boolean b) {
